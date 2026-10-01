@@ -10,21 +10,20 @@ description = "玄剑·战争 BattledXuanjian - 类《战地》大战场小游�
 val paperApiVersion = "26.2.build.+"
 
 /** 可选依赖版本，仅编译期使用，运行期由服务端提供。 */
-val protocolLibVersion = "5.3.0"
+val protocolLibVersion = "5.4.0"
 val placeholderApiVersion = "2.12.3"
 
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/") { name = "papermc" }
-    maven("https://repo.dmulloy2.net/repository/public/") { name = "dmulloy2" }
     maven("https://repo.extendedclip.com/releases/") { name = "placeholderapi" }
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:$paperApiVersion")
 
-    // 可选依赖：隐藏 Tab 列表中的敌方玩家 ID
-    compileOnly("com.comphenix.protocol:ProtocolLib:$protocolLibVersion") { isTransitive = false }
+    // 可选依赖：隐藏 Tab 列表中的敌方玩家 ID（5.4.0 起由 Maven Central 发布，groupId 为 net.dmulloy2）
+    compileOnly("net.dmulloy2:ProtocolLib:$protocolLibVersion") { isTransitive = false }
     // 可选依赖：PlaceholderAPI 变量扩展
     compileOnly("me.clip:placeholderapi:$placeholderApiVersion") { isTransitive = false }
 

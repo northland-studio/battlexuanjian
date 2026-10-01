@@ -78,6 +78,8 @@
 - 玩家 ID 前显示阵营头衔（`§9[C] 玩家名` / `§c[M] 玩家名`）。
 - 头顶名字：原版 Scoreboard Team + `NAME_TAG_VISIBILITY = FOR_OWN_TEAM`，敌方看不到。
 - Tab 列表：**需要 ProtocolLib**，插件拦截 `PLAYER_INFO` 包把敌方条目显示名替换为遮挡文本（默认 `§k`），同阵营可见；未安装/不兼容时自动降级并在控制台告警（需求 §6 明确该能力依赖 ProtocolLib）。
+
+  > ⚠️ 上游现状：ProtocolLib 最新正式版 **5.4.0（2025-08）仅支持到 Minecraft 1.21.8，尚不支持 26.x**。因此本插件在 26.2 服务端上会走“降级 + 控制台告警”分支（CI 已断言该分支行为正常）；一旦 ProtocolLib 适配 26.x，只需把 jar 放入 `plugins/` 即可自动启用，无需改动代码。
 - 聊天栏：`teams.chat-mode: GLOBAL`（全服可见、前缀区分）或 `TEAM_ONLY`（仅同阵营可见）。
 - 友军伤害关闭（Scoreboard Team + `EntityDamageByEntityEvent` 双重保障）。
 - 原版 `/team`、`/scoreboard` 指令修改队伍后，插件自动同步回自己的设置。
@@ -118,11 +120,11 @@
 | Job | 内容 |
 | --- | --- |
 | `build` | JDK 25 + Gradle 9.8 → 编译、JUnit 5 单元测试、打包 jar、校验 jar 内容、上传产物 |
-| `smoke` | 下载最新 Paper 26.2 服务端 → 实机加载插件 → 控制台执行 `/bx status`、`/bx selftest`、`/bx point list`、`/bx help` → 断言自检 `RESULT=PASS`、无插件异常堆栈 → 上传服务端日志 |
+| `smoke` | 下载最新 Paper 26.2 服务端与 PlaceholderAPI 2.12.3 → 预置据点/出发点 → 实机加载插件 → 控制台执行 `/bx status`、`/bx start`、`/bx set reinforcements 30`、`/bx status`、`/bx selftest`、`/bx point list`、`/bx help` → 断言自检 `RESULT=PASS`、指令链路输出、`%bx_*%` 扩展注册、无插件异常堆栈 → 上传服务端日志 |
 
 流水线：`.github/workflows/build.yml`；冒烟脚本：`ci/smoke-test.sh`（可用 `WORKDIR`、`MC_VERSION`、`JAR_DIR` 环境变量复用）。
 
-`/bx selftest` 会在真实服务端中检查：配置解析、消息渲染、指令注册、世界与选区、Scoreboard/BossBar/侧边栏 API、占领状态机（15 秒脱离 / 再 15 秒占领 / 人数加速 / 双方冻结）、阵营分配平衡、兵力池、装备 PDC 标记、据点持久化、可选依赖挂钩。
+`/bx selftest` 会在真实服务端中检查：配置解析、消息渲染、指令注册、世界与选区、Scoreboard/BossBar/侧边栏 API、占领状态机（15 秒脱离 / 再 15 秒占领 / 人数加速 / 双方冻结）、阵营分配平衡、兵力池、装备 PDC 标记、据点持久化、PlaceholderAPI 变量、可选依赖挂钩。
 
 本地如需自行调试（需要 JDK 25）：
 

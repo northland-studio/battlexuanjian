@@ -249,6 +249,27 @@ public final class SelfTest {
             return detail;
         });
 
+        check("placeholder-api", () -> {
+            if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
+                warn("placeholder-api", "未安装 PlaceholderAPI，跳过变量检查（softdepend，可选）");
+                return null;
+            }
+            Class<?> expansionClass = Class.forName("com.northland.battledxuanjian.hook.BxPlaceholderExpansion");
+            Object expansion = expansionClass.getConstructor(BattledXuanjianPlugin.class).newInstance(plugin);
+            String identifier = (String) expansionClass.getMethod("getIdentifier").invoke(expansion);
+            require("bx".equals(identifier), "扩展标识应为 bx，实际 " + identifier);
+            java.lang.reflect.Method onRequest = expansionClass.getMethod("onRequest", org.bukkit.OfflinePlayer.class, String.class);
+            Object reinforcements = onRequest.invoke(expansion, null, "reinforcements");
+            Object phase = onRequest.invoke(expansion, null, "phase");
+            Object pointsTotal = onRequest.invoke(expansion, null, "points_total");
+            require(reinforcements != null, "%bx_reinforcements% 返回 null");
+            require(phase != null, "%bx_phase% 返回 null");
+            require(pointsTotal != null, "%bx_points_total% 返回 null");
+            require(onRequest.invoke(expansion, null, "not_a_real_placeholder") == null,
+                    "未知变量应返回 null 交给其它扩展处理");
+            return "identifier=bx reinforcements=" + reinforcements + " phase=" + phase + " points=" + pointsTotal;
+        });
+
         int total = passed + failed + warned;
         StringBuilder summary = new StringBuilder();
         summary.append("SUMMARY total=").append(total)

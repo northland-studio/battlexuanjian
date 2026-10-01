@@ -45,6 +45,13 @@ echo "$SHA256  $WORKDIR/paper.jar" | sha256sum -c - || fail "Paper 服务端校�
 cp "$PLUGIN_JAR" "$WORKDIR/plugins/"
 echo "eula=true" > "$WORKDIR/eula.txt"
 
+# 安装可选依赖 PlaceholderAPI（2.12.3 明确支持 26.2），用于验证 %bx_*% 变量扩展真实注册
+PAPI_URL="https://cdn.modrinth.com/data/lKEzGugV/versions/pIvQcXW8/PlaceholderAPI-2.12.3.jar"
+PAPI_SHA512="f048d55b633fd816c08e2e4472bd54a75fc4d13534682e6e7745408253d2f393706efdc389d12ca2cf28d4dc035a9afdda3eed9ecde51c7e332831391d9b6479"
+log "下载可选依赖 PlaceholderAPI 2.12.3"
+curl -fsSL "$PAPI_URL" -o "$WORKDIR/plugins/PlaceholderAPI-2.12.3.jar"
+echo "$PAPI_SHA512  $WORKDIR/plugins/PlaceholderAPI-2.12.3.jar" | sha512sum -c - || fail "PlaceholderAPI 校验失败"
+
 # 预置一个据点与双方出发点：让开局指令、BossBar、侧边栏与据点列表在 CI 中真正跑起来
 mkdir -p "$WORKDIR/plugins/BattledXuanjian"
 cat > "$WORKDIR/plugins/BattledXuanjian/points.yml" <<'EOF'
@@ -195,6 +202,11 @@ grep -aq '人数不足' "$WORKDIR/server.log" || fail "/bx start 未在人数不
 grep -aq '攻方兵力: 30' "$WORKDIR/server.log" || fail "/bx set reinforcements 30 后 /bx status 未显示新兵力"
 grep -aq '据点列表' "$WORKDIR/server.log" || fail "/bx point list 未输出据点列表"
 grep -aq '/bx pos1' "$WORKDIR/server.log" || fail "/bx help 未输出管理员帮助内容"
+
+# 可选依赖断言：PlaceholderAPI 变量扩展必须真实注册并可被解析
+grep -aq 'PlaceholderAPI=已安装' "$WORKDIR/server.log" || fail "自检未检测到 PlaceholderAPI（可选依赖加载失败）"
+grep -aq '已注册 PlaceholderAPI 变量扩展' "$WORKDIR/server.log" || fail "%bx_*% 变量扩展未注册"
+grep -aq '\[BX-SELFTEST\] PASS placeholder-api' "$WORKDIR/server.log" || fail "PlaceholderAPI 变量自检未通过"
 
 log "冒烟测试通过 ✅"
 printf '\n----- server.log (tail 40) -----\n'
