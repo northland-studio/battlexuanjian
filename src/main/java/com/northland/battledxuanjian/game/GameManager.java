@@ -34,7 +34,7 @@ public final class GameManager {
     private final Map<UUID, Location> returnLocations = new HashMap<>();
     private final Random random = new Random();
 
-    private ReinforcementPool pool = new ReinforcementPool(0);
+    private ReinforcementPool pool;
     private GamePhase phase = GamePhase.IDLE;
     private int countdown;
     private int timeRemaining = -1;
@@ -47,6 +47,16 @@ public final class GameManager {
 
     public GameManager(BattledXuanjianPlugin plugin) {
         this.plugin = plugin;
+        int configured = 50;
+        try {
+            if (plugin.config() != null) {
+                configured = plugin.config().reinforcementsM;
+            }
+        } catch (Throwable ignored) {
+            // 配置尚未就绪时使用默认值，reload 时会再次同步
+        }
+        // 开局前也应展示配置的攻方兵力（而不是 0）
+        this.pool = new ReinforcementPool(configured);
     }
 
     // ---------------------------------------------------------------- 状态查询

@@ -44,6 +44,39 @@ echo "$SHA256  $WORKDIR/paper.jar" | sha256sum -c - || fail "Paper 服务端校�
 
 cp "$PLUGIN_JAR" "$WORKDIR/plugins/"
 echo "eula=true" > "$WORKDIR/eula.txt"
+
+# 预置一个据点与双方出发点：让开局指令、BossBar、侧边栏与据点列表在 CI 中真正跑起来
+mkdir -p "$WORKDIR/plugins/BattledXuanjian"
+cat > "$WORKDIR/plugins/BattledXuanjian/points.yml" <<'EOF'
+points:
+  A:
+    world: world
+    min:
+    - 0
+    - -60
+    - 0
+    max:
+    - 9
+    - -50
+    - 9
+    owner: C
+spawns:
+  C:
+    world: world
+    x: 0.5
+    y: -59.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+  M:
+    world: world
+    x: 9.5
+    y: -59.0
+    z: 9.5
+    yaw: 0.0
+    pitch: 0.0
+EOF
+
 cat > "$WORKDIR/server.properties" <<'EOF'
 online-mode=false
 level-name=world
@@ -104,12 +137,16 @@ grep -aq "BattledXuanjian" server.log || fail "日志中未出现 BattledXuanjia
 
 send "plugins"
 send "bx status"
+send "bx start"
+sleep 3
+send "bx set reinforcements 30"
+send "bx status"
 send "bx selftest"
 if ! wait_for '\[BX-SELFTEST\] RESULT=' "$SELFTEST_TIMEOUT" '插件自检结果'; then
   fail "插件自检未返回结果（${SELFTEST_TIMEOUT}s 超时）"
 fi
 
-# 再跑一次指令链路，验证 tab 补全注册与据点列表分支
+# 再跑一次指令链路，验证补全注册、据点列表与帮助分支
 send "bx point list"
 send "bx help"
 sleep 5
@@ -151,6 +188,13 @@ fi
 
 grep -aq 'BattledXuanjian v' "$WORKDIR/server.log" || fail "缺少插件启用日志"
 grep -aq '玄剑·战争' "$WORKDIR/server.log" || fail "缺少插件启用中文日志（编码可能异常）"
+
+# 指令链路断言：人数不足拦截 + 兵力动态调整 + 据点列表/帮助无异常
+grep -aq '据点 1 个' "$WORKDIR/server.log" || fail "预置据点未被加载（启用日志应显示 据点 1 个）"
+grep -aq '人数不足' "$WORKDIR/server.log" || fail "/bx start 未在人数不足时给出提示"
+grep -aq '攻方兵力: 30' "$WORKDIR/server.log" || fail "/bx set reinforcements 30 后 /bx status 未显示新兵力"
+grep -aq '据点列表' "$WORKDIR/server.log" || fail "/bx point list 未输出据点列表"
+grep -aq '/bx pos1' "$WORKDIR/server.log" || fail "/bx help 未输出管理员帮助内容"
 
 log "冒烟测试通过 ✅"
 printf '\n----- server.log (tail 40) -----\n'
