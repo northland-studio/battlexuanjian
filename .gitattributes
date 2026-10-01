@@ -1,0 +1,6 @@
+# 统一换行符：源码与脚本一律 LF，Windows 批处理保留 CRLF
+* text=auto eol=lf
+*.bat text eol=crlf
+*.jpg binary
+*.png binary
+*.jar binary

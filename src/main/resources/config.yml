@@ -1,0 +1,176 @@
+# ============================================================
+#  玄剑·战争 BattledXuanjian 配置文件
+#  Paper 26.2+ / Java 25
+#  所有关键参数均可热重载：/bx reload
+# ============================================================
+
+# ---------------- 基础设置 ----------------
+game:
+  min-players: 4                 # 最少人数，低于该人数无法开局
+  countdown: 30                  # 开始倒计时（秒）
+  time-limit: 0                  # 0 表示无时间限制；否则时间到守方（C军）获胜（单位：分钟）
+  allow-mid-join: true           # 允许中途加入
+  auto-balance: true             # 自动平衡人数（中途加入时优先补人少的一方）
+  auto-next-round: false         # 本局结束后是否自动进入下一局倒计时
+  # 等待区大厅坐标（可由 /bx lobby set 设置，world 为空表示未设置）
+  lobby:
+    world: ""
+    x: 0.0
+    y: 64.0
+    z: 0.0
+    yaw: 0.0
+    pitch: 0.0
+
+# ---------------- 兵力设置 ----------------
+reinforcements:
+  M: 50                          # 攻方（M军）初始公共复活次数
+  C: -1                          # 守方（C军）-1 表示无限
+
+# ---------------- 重生设置 ----------------
+respawn:
+  delay: 5                       # 重生等待秒数
+  min-distance: 20               # 重生点与死亡点最小距离（格）
+  safe-search-attempts: 32       # 在死亡点附近寻找安全落点的最大尝试次数
+
+# ---------------- 据点占领设置 ----------------
+capture:
+  base-time: 15                  # 基础占领/脱离时间（秒，单人时）
+  speed-per-player: 0.5          # 每多一名玩家，速度增加比例（1 人时为基础速度，2 人为 1.5 倍…）
+  update-interval-ticks: 10      # 占领逻辑刷新间隔（刻），10 刻 = 0.5 秒
+  bossbar:
+    visible-to-all: true         # 据点 BossBar 对所有玩家可见
+
+# ---------------- 队伍显示设置 ----------------
+teams:
+  C:
+    name: "C军"
+    color: "§9"                  # 蓝色（守方）
+    prefix: "§9[C] "
+  M:
+    name: "M军"
+    color: "§c"                  # 红色（攻方）
+    prefix: "§c[M] "
+  hide-enemy-nametag: true       # 隐藏敌方头顶名字（原版 Scoreboard Team 实现）
+  hide-enemy-tab: true           # 隐藏敌方 Tab 名字（需要 ProtocolLib，缺失时自动降级并告警）
+  tab-mask: "§k"                 # Tab 遮挡前缀（&k 为乱码字符，可改为空字符串表示空白）
+  chat-mode: GLOBAL              # GLOBAL = 全服可见（前缀区分）；TEAM_ONLY = 仅同阵营可见
+  friendly-fire: false           # 友军伤害开关（false = 关闭友军伤害）
+  sync-vanilla-team-command: true # 监听原版 /team 指令并自动同步回本插件的队伍设置
+
+# ---------------- 装备包设置 ----------------
+kits:
+  prevent-enemy-pickup: true     # 禁止拾取敌方阵营装备
+  prevent-drop: true             # 禁止丢弃本阵营装备包物品
+  clear-effects-on-respawn: true # 重生时清除药水效果
+
+# ---------------- 侧边栏 ----------------
+sidebar:
+  enabled: true
+  title: "§6玄剑·战争"
+  lines:
+    time: "§f时间: §a{time}"
+    reinforcements: "§f攻方兵力: §c{count}"
+    point-owned: "§f据点 {point}: {color}{side}军"
+    point-neutral: "§f据点 {point}: §7无主"
+    point-contesting: "§f据点 {point}: {color}争夺中 {progress}%"
+    footer: "§7/bx help 查看指令"
+
+# ---------------- 宣告设置 ----------------
+broadcast:
+  chat: true
+  title: true
+  actionbar: true
+  sound: true
+  bossbar: true
+  sidebar: true
+  sounds:
+    countdown: "block.note_block.hat"
+    start: "entity.player.levelup"
+    capture: "block.note_block.pling"
+    decapture: "block.note_block.bass"
+    victory: "ui.toast.challenge_complete"
+    defeat: "entity.villager.no"
+
+# ---------------- 统计与存储 ----------------
+stats:
+  persist: true                  # 是否把累计统计写入 stats.yml
+  file: "stats.yml"
+
+storage:
+  points-file: "points.yml"      # 据点、选区、出发点、大厅坐标
+  items-file: "items.yml"        # 阵营装备包
+
+# ---------------- 文本消息（支持 & 颜色代码） ----------------
+messages:
+  prefix: "&e[战地] &r"
+  no-permission: "&c你没有权限执行该指令。"
+  player-only: "&c该指令只能由玩家执行。"
+  usage: "&7用法: &f{usage}"
+  unknown-subcommand: "&c未知的子指令: &f{input}&c，使用 &f/bx help&c 查看帮助。"
+  reloaded: "&a配置已重载。"
+  join-hint: "&7使用 &f/bx join &7加入战局。"
+  joined: "&a你已加入战局等待队列。"
+  already-joined: "&e你已经在队列中。"
+  not-joined: "&e你还没有加入战局。"
+  left: "&e你已离开战局。"
+  mid-join-denied: "&c本局已开始，且未开放在中途加入。"
+  team-joined: "&a你预选了 {color}{side}军&a，最终分配会按人数平衡调整。"
+  team-assigned: "&a你被分配到 {color}{side}军&a。"
+  team-spectate: "&7你已进入旁观模式。"
+  not-enough-players: "&c人数不足：需要至少 {min} 名玩家（当前 {current}）。"
+  game-running: "&c当前已有一局正在进行，使用 &f/bx stop &c可强制结束。"
+  game-idle: "&e当前没有进行中的对局。"
+  no-points: "&c还没有配置任何据点，请先用 /bx pos1、/bx pos2 与 /bx point create 创建据点。"
+  game-stopped: "&e本局已被管理员强制结束。"
+  game-started: "&6[战地] &f战斗开始！{color}{side}军 &f为攻方，占领全部据点即可获胜。"
+  countdown-chat: "&e[战地] &f距离战斗开始还有 &e{seconds} &f秒。"
+  countdown-title: "§e{seconds}"
+  countdown-subtitle: "§f战斗即将开始"
+  countdown-cancelled: "&c人数不足，倒计时已取消。"
+  lobby-set: "&a等待区大厅坐标已设置。"
+  spawn-set: "&a{color}{side}军 &a出发点已设置。"
+  spawn-not-set: "&e{color}{side}军 &e还没有设置出发点，将使用世界出生点。"
+  point-created: "&a据点 &f{point} &a创建成功（范围 {size} 格）。"
+  point-exists: "&c据点 &f{point} &c已存在。"
+  point-removed: "&a据点 &f{point} &a已删除。"
+  point-not-found: "&c找不到据点 &f{point}&c。"
+  point-list-empty: "&7当前没有配置任何据点。"
+  point-list-header: "&6据点列表（{count}）："
+  point-list-line: "&f- &e{point} &7[{world}] &7归属: {color}{owner} &7进度 {progress}%"
+  point-name-invalid: "&c据点名称只能包含字母、数字、下划线或短横线。"
+  point-need-selection: "&c请先用 &f/bx pos1 &c和 &f/bx pos2 &c选择长方体区域。"
+  point-selection-world-mismatch: "&c两个选区点必须在同一个世界。"
+  pos1-set: "&a已设置选区点 1: &f{location}"
+  pos2-set: "&a已设置选区点 2: &f{location}"
+  kit-need-shulker: "&c请手持潜影盒（盒内放入装备）再执行该指令。"
+  kit-saved: "&a已保存 {color}{side}军 &a装备包：物品栏 {count} 件、护甲 {armor} 件、副手 {offhand}。"
+  kit-missing: "&e{color}{side}军 &e尚未配置装备包，已跳过发放。"
+  kit-cleared: "&a已清空所有阵营装备包。"
+  reinforcements-set: "&a攻方（M军）公共兵力已设置为 &f{count}&a。"
+  time-set: "&a时间限制已设置为 &f{minutes} &a分钟（0 = 无限制）。"
+  captured: "&e[战地] {color}{side}军 &f占领了据点 &e{point}&f！"
+  decaptured: "&e[战地] 据点 &e{point} &f已脱离 {color}{side}军 &f掌控！"
+  secured: "&7[战地] 据点 {point} 已被 {color}{side}军 &7重新稳固。"
+  reinforcements-left: "&f攻方兵力剩余: &c{count}"
+  reinforcements-depleted: "&c[战地] 攻方兵力已耗尽！"
+  time-up: "&e[战地] 时间耗尽，守方获胜。"
+  all-points-captured: "&e[战地] 攻方占领了全部据点！"
+  victory: "&6[战地] {color}{side}军 &6获得胜利！&7（{reason}）"
+  reason-reinforcements: "攻方兵力耗尽"
+  reason-time-up: "时间耗尽"
+  reason-all-points: "占领全部据点"
+  reason-forced: "管理员强制结束"
+  match-summary-header: "&6===== 本局战报 ====="
+  match-summary-line: "&f{player} &7- 击杀 &c{kills} &7/ 死亡 &f{deaths} &7/ 伤害 &e{damage} &7/ 占点 &a{captures}"
+  status-header: "&6===== 玄剑·战争 状态 ====="
+  status-phase: "&f阶段: &a{phase}"
+  status-players: "&f参战玩家: &a{count} &7(C军 {c} / M军 {m})"
+  status-reinforcements: "&f攻方兵力: &c{count}"
+  status-time: "&f剩余时间: &a{time}"
+  status-points: "&f据点: &a{points}"
+  selftest-header: "&6===== 自检开始 ====="
+  selftest-footer: "&6===== 自检结束 &f{result}&6 ====="
+  stats-header: "&6===== 累计统计 ====="
+  stats-line: "&f{player} &7- 击杀 &c{kills} &7/ 死亡 &f{deaths} &7/ 占点 &a{captures} &7/ 场次 &e{matches}"
+  stats-empty: "&7暂无统计数据。"
+  stats-reset: "&a统计数据已清空。"

@@ -1,0 +1,20 @@
+name: BattledXuanjian
+version: '${version}'
+main: com.northland.battledxuanjian.BattledXuanjianPlugin
+api-version: '26.2'
+description: 玄剑·战争 - 类《战地》大战场小游戏插件（据点占领 / 兵力消耗 / 攻防胜负）
+authors: [Northland Studio]
+website: https://github.com/northland-studio/battlexuanjian
+softdepend: [ProtocolLib, PlaceholderAPI]
+commands:
+  bx:
+    description: 玄剑·战争主指令
+    usage: /bx help
+    aliases: [battledxuanjian, xuanjian, zhanzheng]
+permissions:
+  battledxuanjian.admin:
+    description: 玄剑·战争管理员权限（开局、据点、装备、参数）
+    default: op
+  battledxuanjian.player:
+    description: 玄剑·战争玩家权限（加入、离开、选边）
+    default: true
