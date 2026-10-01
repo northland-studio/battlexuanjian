@@ -2,6 +2,7 @@ package com.northland.battledxuanjian.ui;
 
 import com.northland.battledxuanjian.BattledXuanjianPlugin;
 import com.northland.battledxuanjian.config.BxConfig;
+import com.northland.battledxuanjian.util.Text;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
